@@ -6,7 +6,7 @@ import (
 	"registry"
 )
 
-//TestClient tests unit
+//test reg as client
 func main() {
 	reg := registry.NewRegistry()
 	cln := clientimpl.NewClient()

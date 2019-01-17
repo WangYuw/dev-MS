@@ -6,7 +6,7 @@ import (
 	"services"
 )
 
-//TestServer tests unit
+//test auth as client
 func main() {
 	auth1, _ := services.NewAuth("1.0.0.0", 1, "v1.0.0")
 	auth2, _ := services.NewAuth("1.0.0.1", 2, "v1.0.0")

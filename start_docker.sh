@@ -1,10 +1,7 @@
 #!/bin/bash
-sudo docker stop auth1
-sudo docker stop reg1
-sudo docker rm auth1
-sudo docker rm reg1
-sudo docker rmi auth_img
-sudo docker rmi reg_img
+sudo docker stop auth1 reg1
+sudo docker rm auth1 reg1
+sudo docker rmi auth_img reg_img
 sudo docker network rm ms_network
 
 sudo docker build -t auth_img ./dev-AuthMS

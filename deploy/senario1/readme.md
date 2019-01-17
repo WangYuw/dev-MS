@@ -6,6 +6,8 @@
 (Terminal 2) sudo docker exec -ti reg1 "/bin/bash"
   [ client.Do() failed with 'Post http://auth1:8080/services/quality: dial tcp 172.25.0.2:8080: connect: connection refused' ] - change connection ip in src/main.go
 
+  -> Should hard code IP address ???
+
 
 * Deploy dev-AuthMS (an example of microservices)
   - cd ../../dev-AuthMS [ ok ]
