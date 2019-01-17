@@ -13,7 +13,7 @@ func main() {
 	req, _ := rentities.NewServiceRequest("Auth", "v1.0.0")*/
 
 	//test auth as server
-	auth1.GetConnection("172.25.0.2", config.ClientPort)
+	auth1.GetConnection("auth1", config.ClientPort)
 
 	//test auth as client
 	/*auth1.ListAllServices()

@@ -10,6 +10,8 @@ import (
 func main() {
 	reg := registry.NewRegistry()
 	cln := clientimpl.NewClient()
-	cln.SendQRequest("Auth", "v1.0.0", "auth1", config.DefaultPort)
+
 	reg.SendQRequests(cln, config.DefaultPort)
+
+	cln.SendQRequest("Auth", "v1.0.0", "auth1", config.DefaultPort)
 }
