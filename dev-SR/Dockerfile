@@ -9,3 +9,5 @@ ADD src/main.go /go/src
 RUN go build main.go
 
 ENTRYPOINT [ "./main" ]
+
+EXPOSE 8080
