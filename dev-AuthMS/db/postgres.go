@@ -91,7 +91,7 @@ func (p *PostgresDB) FindMinLoadSrv(name string, version string) (rentities.Regi
 //UpdateLoad updates load
 func (p *PostgresDB) UpdateLoad(id int64, load float32) error {
 	fmt.Println("# Updating load ...")
-	_, err := p.db.Exec("UPDATE registry SET load = $2 WHERE instance_id = $1", id, load)
+	_, err := p.db.Exec("UPDATE registry SET load = $2 WHERE id = $1", id, load)
 	return err
 }
 

@@ -1,6 +1,7 @@
 package serveimpl
 
 import (
+	"db"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,13 +10,13 @@ import (
 )
 
 //ShowHandler is a handler func to show all services
-func ShowHandler(db *registry.Registry) http.Handler {
+func ShowHandler(reg *registry.Registry, pdb *db.PostgresDB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "Not found", http.StatusNotFound)
 			return
 		}
-		reponse, err := db.GetAll()
+		reponse, err := reg.GetAll(pdb)
 		if err != nil {
 			log.Println(err)
 			return
@@ -26,7 +27,7 @@ func ShowHandler(db *registry.Registry) http.Handler {
 }
 
 //SRegisterHandler is a handler func to register services
-func SRegisterHandler(db *registry.Registry) http.Handler {
+func SRegisterHandler(db *registry.Registry, pdb *db.PostgresDB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "Not found", http.StatusNotFound)
@@ -40,7 +41,7 @@ func SRegisterHandler(db *registry.Registry) http.Handler {
 			log.Println("JSON Decoder error")
 			return
 		}
-		err = db.Register(&request)
+		err = db.Register(pdb, &request)
 		if err != nil {
 			log.Println(err)
 			return
@@ -50,7 +51,7 @@ func SRegisterHandler(db *registry.Registry) http.Handler {
 }
 
 //ServiceInfoHandler is a handler func to find services
-func ServiceInfoHandler(db *registry.Registry) http.Handler {
+func ServiceInfoHandler(db *registry.Registry, pdb *db.PostgresDB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "Not found", http.StatusNotFound)
@@ -64,7 +65,7 @@ func ServiceInfoHandler(db *registry.Registry) http.Handler {
 			log.Println("JSON Decoder error")
 			return
 		}
-		reponse, err := db.FindService(request)
+		reponse, err := db.FindService(pdb, request)
 		if err != nil {
 			log.Println(err)
 			return
@@ -75,7 +76,7 @@ func ServiceInfoHandler(db *registry.Registry) http.Handler {
 }
 
 //SQualityHandler is a handler func to handle service quality
-func SQualityHandler(db *registry.Registry) http.Handler {
+func SQualityHandler(db *registry.Registry, pdb *db.PostgresDB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "Not found", http.StatusNotFound)
@@ -89,7 +90,7 @@ func SQualityHandler(db *registry.Registry) http.Handler {
 			log.Println("JSON Decoder error")
 			return
 		}
-		err = db.UpdateSQ(&request)
+		err = db.UpdateSQ(pdb, &request)
 		if err != nil {
 			log.Println(err)
 			return

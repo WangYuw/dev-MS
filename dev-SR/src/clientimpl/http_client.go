@@ -2,6 +2,8 @@ package clientimpl
 
 import (
 	"bytes"
+	"config"
+	"db"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -59,7 +61,11 @@ func (hc HTTPClient) SendQRequest(sn string, sv string, ip string, port string) 
 		return
 	}
 	r := registry.NewRegistry()
-	err = r.UpdateSQ(&sqi)
+	pdb, err := db.NewPostgres(config.DBUser, config.DBPassword, config.DBName)
+
+	fmt.Printf("%s %d %f\n", sqi.TName, sqi.IID, sqi.Quality.Load)
+
+	err = r.UpdateSQ(pdb, &sqi)
 	fmt.Printf("resp status code: %d\n", resp.StatusCode)
 	if err != nil {
 		log.Println(err)

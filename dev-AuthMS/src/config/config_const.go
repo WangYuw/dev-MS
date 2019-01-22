@@ -17,3 +17,12 @@ const ClientPort = "8080"
 
 //DefaultIP is default ip
 const DefaultIP = "localhost"
+
+//DBUser user of db
+const DBUser string = "postgres"
+
+//DBPassword password of db
+const DBPassword string = "postgres"
+
+//DBName name of db
+const DBName string = "registry"

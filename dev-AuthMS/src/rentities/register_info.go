@@ -3,8 +3,6 @@ package rentities
 import (
 	"config"
 	"fmt"
-	"math/rand"
-	"time"
 )
 
 //RegisterInfo gives the information of registering service
@@ -17,7 +15,7 @@ type RegisterInfo struct {
 }
 
 //NewRegisterInfo constructs a register info
-func NewRegisterInfo(n string, id int64, ip string, v string) (*RegisterInfo, error) {
+func NewRegisterInfo(n string, id int64, ip string, v string, q *ServiceQuality) (*RegisterInfo, error) {
 	if n == "" {
 		return nil, fmt.Errorf("NewRegisterInfo: service's name miss")
 	}
@@ -30,15 +28,13 @@ func NewRegisterInfo(n string, id int64, ip string, v string) (*RegisterInfo, er
 	if v == "" {
 		v = config.DefaultVersion
 	}
-	//random load
-	rand.Seed(time.Now().UnixNano())
-	sq := NewServiceQuality(rand.Float32())
+
 	ri := &RegisterInfo{
 		TName:   n,
 		IID:     id,
 		IP:      ip,
 		Version: v,
-		Quality: sq,
+		Quality: q,
 	}
 	return ri, nil
 }

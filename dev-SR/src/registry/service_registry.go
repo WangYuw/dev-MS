@@ -3,6 +3,7 @@ package registry
 import (
 	"client"
 	"config"
+	"db"
 	"fmt"
 	"rentities"
 	"server"
@@ -29,13 +30,14 @@ func (r *Registry) GetConnection(s server.Server, ip string, port string) {
 	s.NewConnection(ip, port)
 }
 
-//GetAll all instances of services
-func (r *Registry) GetAll() (map[string]ServiceList, error) {
-	return r.ServicesMap, nil
+//GetAll all instances of services from db
+func (r *Registry) GetAll(pdb *db.PostgresDB) ([]rentities.RegisterInfo, error) {
+	return pdb.ListRegs()
+	//return r.ServicesMap, nil
 }
 
 //Register adds RegisterInfo into the map of services in service registry
-func (r *Registry) Register(info *rentities.RegisterInfo) error {
+func (r *Registry) Register(pdb *db.PostgresDB, info *rentities.RegisterInfo) error {
 	sList, ok := r.ServicesMap[info.TName]
 	if ok {
 		for _, ri := range sList {
@@ -45,11 +47,13 @@ func (r *Registry) Register(info *rentities.RegisterInfo) error {
 		}
 	}
 	r.ServicesMap[info.TName] = append(r.ServicesMap[info.TName], info)
+	//add into db
+	pdb.InsertReg(*info)
 	return nil
 }
 
 //Unregister deletes RegisterInfo from the map of services in service registry
-func (r *Registry) Unregister(info *rentities.RegisterInfo) error {
+func (r *Registry) Unregister(pdb *db.PostgresDB, info *rentities.RegisterInfo) error {
 	sList, okName := r.ServicesMap[info.TName]
 	if okName != true {
 		return fmt.Errorf("Unregister error: service not exist")
@@ -59,6 +63,8 @@ func (r *Registry) Unregister(info *rentities.RegisterInfo) error {
 			sList[i] = sList[len(sList)-1]
 			sList[len(sList)-1] = nil
 			sList = sList[:len(sList)-1]
+			//delete from db
+			pdb.DeleteReg(info.IID)
 			return nil
 		}
 	}
@@ -66,11 +72,13 @@ func (r *Registry) Unregister(info *rentities.RegisterInfo) error {
 }
 
 //FindService finds required service
-func (r *Registry) FindService(req rentities.ServiceRequest) (*rentities.ServiceInfo, error) {
-	sList, okName := r.ServicesMap[req.TName]
+func (r *Registry) FindService(pdb *db.PostgresDB, req rentities.ServiceRequest) (*rentities.ServiceInfo, error) {
+	/*sList, okName := r.ServicesMap[req.TName]
 	if okName != true {
 		return nil, fmt.Errorf("FindService error: service not exist")
 	}
+
+	//get min load instance
 	minLoad := sList[0].Quality.Load
 	minIndex := 0
 	for i, ri := range sList {
@@ -80,27 +88,37 @@ func (r *Registry) FindService(req rentities.ServiceRequest) (*rentities.Service
 			}
 		}
 	}
-	serv, err := rentities.NewServiceInfo(sList[minIndex].TName, sList[minIndex].IID,
-		sList[minIndex].IP, sList[minIndex].Version, config.DefaultTTL)
+	*/
+	srv, err := pdb.FindMinLoadSrv(req.TName, req.Version)
+	ri, err := rentities.NewServiceInfo(srv.TName, srv.IID, srv.IP, srv.Version, config.DefaultTTL)
+	/*srv, err := rentities.NewServiceInfo(sList[minIndex].TName, sList[minIndex].IID,
+	sList[minIndex].IP, sList[minIndex].Version, config.DefaultTTL)*/
+
 	if err != nil {
 		return nil, err
 	}
-	return serv, nil
+	return ri, nil
 }
 
-//UpdateSQ updates serv=>ice quality
-func (r *Registry) UpdateSQ(resp *rentities.SQualityInfo) error {
-	_, okName := r.ServicesMap[resp.TName]
-	if okName != true {
-		return fmt.Errorf("UpdateSQ erroSr: service not exist")
-	}
-	for _, ri := range r.ServicesMap[resp.TName] {
-		if ri.IID == resp.IID && ri.IP == resp.IP {
-			ri.Quality.Load = resp.Quality.Load
-			return nil
+//UpdateSQ updates service quality
+func (r *Registry) UpdateSQ(pdb *db.PostgresDB, resp *rentities.SQualityInfo) error {
+	//update db
+	return pdb.UpdateLoad(resp.IID, resp.Quality.Load)
+
+	/*
+		_, okName := r.ServicesMap[resp.TName]
+		if okName != true {
+			return fmt.Errorf("UpdateSQ erroSr: service not exist")
 		}
-	}
-	return fmt.Errorf("UpdateSQ error: service instance not exist")
+		for _, ri := range r.ServicesMap[resp.TName] {
+			if ri.IID == resp.IID && ri.IP == resp.IP {
+				ri.Quality.Load = resp.Quality.Load
+
+				return nil
+			}
+		}
+		return fmt.Errorf("UpdateSQ error: service instance not exist")
+	*/
 }
 
 //SendQRequests sends quality request to all services

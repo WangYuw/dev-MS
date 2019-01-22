@@ -11,7 +11,7 @@ func main() {
 
 	//test reg as server
 	srv := serveimpl.NewServer(config.DefaultProtocol)
-	reg.GetConnection(srv, "reg1", config.DefaultPort)
+	go reg.GetConnection(srv, "localhost", config.DefaultPort)
 
 	/*//test reg as client
 	cln := clientimpl.NewClient()

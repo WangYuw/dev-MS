@@ -1,6 +1,8 @@
 package serveimpl
 
 import (
+	"config"
+	"db"
 	"log"
 	"net/http"
 	"registry"
@@ -21,11 +23,14 @@ func NewServer(t string) *HTTPServer {
 //NewConnection news a connection (impl. Server)
 func (hs HTTPServer) NewConnection(ip string, port string) {
 	r := registry.NewRegistry()
+	pdb, err := db.NewPostgres(config.DBUser, config.DBPassword, config.DBName)
+	if err != nil {
+		panic(err)
+	}
 	mux := http.NewServeMux()
-	mux.Handle("/services/all", ShowHandler(r))
-	mux.Handle("/services/registry", SRegisterHandler(r))
-	mux.Handle("/services/info", ServiceInfoHandler(r))
-	//mux.Handle("/services/quality", SQualityHandler(r))
+	mux.Handle("/services/all", ShowHandler(r, pdb))
+	mux.Handle("/services/registry", SRegisterHandler(r, pdb))
+	mux.Handle("/services/info", ServiceInfoHandler(r, pdb))
 
 	log.Printf("http server serving on %s port %s", ip, port)
 	log.Fatal(http.ListenAndServe(ip+":"+port, mux))

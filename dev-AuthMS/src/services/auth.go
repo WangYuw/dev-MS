@@ -49,23 +49,30 @@ func NewAuth(ip string, id int64, v string) (*Auth, error) {
 //GetConnection gets http connection (server)
 func (a *Auth) GetConnection(ip string, port string) {
 	log.Printf("service auth serving on %s port %s", ip, port)
-	http.HandleFunc("/services/quality", a.qualityHandler)
+	//connect db
+	/*pdb, err := db.NewPostgres(config.DBUser, config.DBPassword, config.DBName)
+	if err != nil {
+		panic(err)
+	}*/
+	http.Handle("/services/quality", a.qualityHandler())
 	log.Fatal(http.ListenAndServe(ip+":"+port, nil))
 
 }
 
-func (a *Auth) qualityHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
-	}
-	reponse, err := rentities.NewSQI(a.Name, a.IID, a.IP, a.Quality)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	encoder := json.NewEncoder(w)
-	encoder.Encode(reponse)
+func (a *Auth) qualityHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "Not found", http.StatusNotFound)
+			return
+		}
+		reponse, err := rentities.NewSQI(a.Name, a.IID, a.IP, a.Quality)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		encoder := json.NewEncoder(w)
+		encoder.Encode(reponse)
+	})
 }
 
 //ListAllServices sends request to list all services

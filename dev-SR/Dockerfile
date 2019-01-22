@@ -3,9 +3,10 @@ LABEL maintainer="yuwei"
 
 WORKDIR /go/src
 
-ADD src /go/src
-ADD src/main.go /go/src
+COPY src /go/src
+COPY src/main.go /go/src
 
+RUN go get github.com/lib/pq
 RUN go build main.go
 
 ENTRYPOINT [ "./main" ]
