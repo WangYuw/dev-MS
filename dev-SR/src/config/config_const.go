@@ -26,3 +26,9 @@ const DBPassword string = "postgres"
 
 //DBName name of db
 const DBName string = "registry"
+
+//DBHost host of db
+const DBHost string = "pq_db"
+
+//DBPort port of db
+const DBPort string = "5432"

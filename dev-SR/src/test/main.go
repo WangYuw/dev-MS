@@ -13,5 +13,5 @@ func main() {
 
 	reg.SendQRequests(cln, config.DefaultPort)
 
-	cln.SendQRequest("Auth", "v1.0.0", "auth1", config.DefaultPort)
+	//cln.SendQRequest("Auth", "v1.0.0", "auth1", config.DefaultPort)
 }

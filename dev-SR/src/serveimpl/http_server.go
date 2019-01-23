@@ -23,7 +23,7 @@ func NewServer(t string) *HTTPServer {
 //NewConnection news a connection (impl. Server)
 func (hs HTTPServer) NewConnection(ip string, port string) {
 	r := registry.NewRegistry()
-	pdb, err := db.NewPostgres(config.DBUser, config.DBPassword, config.DBName)
+	pdb, err := db.NewPostgres(config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
 	if err != nil {
 		panic(err)
 	}

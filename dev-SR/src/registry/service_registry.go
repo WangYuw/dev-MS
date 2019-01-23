@@ -122,10 +122,14 @@ func (r *Registry) UpdateSQ(pdb *db.PostgresDB, resp *rentities.SQualityInfo) er
 }
 
 //SendQRequests sends quality request to all services
-func (r *Registry) SendQRequests(c client.Client, port string) {
-	for _, sList := range r.ServicesMap {
-		for _, s := range sList {
-			c.SendQRequest(s.TName, s.Version, s.IP, port)
-		}
+func (r *Registry) SendQRequests(c client.Client, port string) error {
+	pdb, err := db.NewPostgres(config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
+	srvs, err := pdb.ListRegs()
+	if err != nil {
+		return err
 	}
+	for _, srv := range srvs {
+		c.SendQRequest(srv.TName, srv.Version, srv.IP, port)
+	}
+	return nil
 }

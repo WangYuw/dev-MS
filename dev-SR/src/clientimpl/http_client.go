@@ -60,10 +60,9 @@ func (hc HTTPClient) SendQRequest(sn string, sv string, ip string, port string) 
 		log.Println("JSON Decoder error")
 		return
 	}
-	r := registry.NewRegistry()
-	pdb, err := db.NewPostgres(config.DBUser, config.DBPassword, config.DBName)
 
-	fmt.Printf("%s %d %f\n", sqi.TName, sqi.IID, sqi.Quality.Load)
+	r := registry.NewRegistry()
+	pdb, err := db.NewPostgres(config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
 
 	err = r.UpdateSQ(pdb, &sqi)
 	fmt.Printf("resp status code: %d\n", resp.StatusCode)
@@ -71,4 +70,5 @@ func (hc HTTPClient) SendQRequest(sn string, sv string, ip string, port string) 
 		log.Println(err)
 		return
 	}
+	fmt.Printf("After updating load: T_Name: %s, I_ID: %d, Load: %f\n", sqi.TName, sqi.IID, sqi.Quality.Load)
 }

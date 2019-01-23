@@ -16,8 +16,8 @@ type PostgresDB struct {
 }
 
 //NewPostgres inits db
-func NewPostgres(user string, password string, name string) (*PostgresDB, error) {
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", user, password, name)
+func NewPostgres(host string, port string, user string, password string, name string) (*PostgresDB, error) {
+	dbinfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, name)
 	//dbinfo := fmt.Sprintf("user=%s dbname=%s sslmode=disable", user, name)
 	db, err := sql.Open("postgres", dbinfo)
 	fmt.Println("# Postgres opened ...")
