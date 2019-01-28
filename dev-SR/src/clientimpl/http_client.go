@@ -6,7 +6,6 @@ import (
 	"db"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"registry"
 	"rentities"
@@ -26,12 +25,11 @@ func NewClient() *HTTPClient {
 }
 
 //SendQRequest (impl. Client) (service name, service version)
-func (hc HTTPClient) SendQRequest(sn string, sv string, ip string, port string) {
+func (hc HTTPClient) SendQRequest(sqr *rentities.SQualityReq, ip string, port string) error {
 	//New SQR and to Json
-	sqr, _ := rentities.NewSQR(sn, sv)
 	sqrJSON, err := json.Marshal(sqr)
 	if err != nil {
-		log.Fatalf("json.Marshal() failed with '%s'\n", err)
+		return fmt.Errorf("json.Marshal() failed with '%s'", err)
 	}
 	//New http client
 	hc.HClient.Timeout = time.Second * 15
@@ -40,13 +38,13 @@ func (hc HTTPClient) SendQRequest(sn string, sv string, ip string, port string) 
 	body := bytes.NewBuffer(sqrJSON)
 	req, err := http.NewRequest(http.MethodPost, uri, body)
 	if err != nil {
-		log.Fatalf("http.NewRequest() failed with '%s'\n", err)
+		return fmt.Errorf("http.NewRequest() failed with '%s'", err)
 	}
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	//Get http response
 	resp, err := hc.HClient.Do(req)
 	if err != nil {
-		log.Fatalf("client.Do() failed with '%s'\n", err)
+		return fmt.Errorf("client.Do() failed with '%s'", err)
 	}
 	defer resp.Body.Close()
 
@@ -57,8 +55,7 @@ func (hc HTTPClient) SendQRequest(sn string, sv string, ip string, port string) 
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(&sqi)
 	if err != nil {
-		log.Println("JSON Decoder error")
-		return
+		return fmt.Errorf("JSON Decoder error")
 	}
 
 	r := registry.NewRegistry()
@@ -67,8 +64,8 @@ func (hc HTTPClient) SendQRequest(sn string, sv string, ip string, port string) 
 	err = r.UpdateSQ(pdb, &sqi)
 	fmt.Printf("resp status code: %d\n", resp.StatusCode)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	fmt.Printf("After updating load: T_Name: %s, I_ID: %d, Load: %f\n", sqi.TName, sqi.IID, sqi.Quality.Load)
+	return nil
 }
