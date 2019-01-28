@@ -11,6 +11,7 @@ sudo docker build -t postgres_img ./dev-DB/postgresql
 sudo docker network create -d bridge --subnet 172.25.0.0/16 ms_network --attachable
 sudo docker run --network=ms_network -itd --name auth1 -p 8081:8080 auth_img 
 sudo docker run --network=ms_network -itd --name reg1 -p 8080:8080 reg_img
+sudo service postgresql stop
 sudo docker run --network=ms_network -itd --name pq_db -p 5432:8080 postgres_img
 
 sudo docker images
